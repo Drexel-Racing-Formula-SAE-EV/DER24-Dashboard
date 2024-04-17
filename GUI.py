@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QProgressBar
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import Qt
-from gpiozero import Button
+#import serial
+#from gpiozero import Button
 
 
 class ElectricCarDashboard(QWidget):
@@ -13,12 +14,12 @@ class ElectricCarDashboard(QWidget):
 
         #Stuff to by controlled by GPIO
         self.AMS_Fault = False
-        self.ECU_Fault = True
+        self.ECU_Fault = False
         self.IMD_Fault = False
 
         self.Speed = 0
         self.Voltage = 0
-        self.BreakPercent = 50
+        self.BrakePercent = 50
         self.ThrottlePercent = 50
 
 
@@ -53,7 +54,7 @@ class ElectricCarDashboard(QWidget):
 
         #Updates Speedometer Data
         self.update_Voltage(self.Speed)
-        self.update_speed(self.Speed)
+        self.update_Speed(self.Speed)
 
 
         # Fault Status Indicator Layout
@@ -75,26 +76,26 @@ class ElectricCarDashboard(QWidget):
         self.status_boxes_layout.setAlignment(Qt.AlignLeft)
 
         #Updates the indicator
-        self.update_AMS_indicator()
-        self.update_IMD_indicator()
-        self.update_ECU_indicator()
+        self.update_AMS_indicator(0)
+        self.update_IMD_indicator(0)
+        self.update_ECU_indicator(0)
 
 
-        # Throttle and Break Bars
+        # Throttle and brake Bars
         self.bars_layout = QHBoxLayout()
 
 
-        self.break_layout = QVBoxLayout()
-        self.break_bar = QProgressBar(self)
-        self.break_bar.setGeometry(200, 80, 250, 20)
-        self.break_bar.setValue(100)
-        self.break_bar.setOrientation(Qt.Vertical)
-        #self.break_bar.setAlignment(Qt.AlignCenter)
+        self.brake_layout = QVBoxLayout()
+        self.brake_bar = QProgressBar(self)
+        self.brake_bar.setGeometry(200, 80, 250, 20)
+        self.brake_bar.setValue(100)
+        self.brake_bar.setOrientation(Qt.Vertical)
+        #self.brake_bar.setAlignment(Qt.AlignCenter)
 
-        self.break_label = QLabel('Breaks')
-        #self.break_label.setAlignment(Qt.AlignCenter)
-        self.break_layout.addWidget(self.break_label)
-        self.break_layout.addWidget(self.break_bar)
+        self.brake_label = QLabel('Brakes')
+        #self.brake_label.setAlignment(Qt.AlignCenter)
+        self.brake_layout.addWidget(self.brake_label)
+        self.brake_layout.addWidget(self.brake_bar)
 
 
         self.throttle_layout = QVBoxLayout()
@@ -109,9 +110,9 @@ class ElectricCarDashboard(QWidget):
         self.throttle_layout.addWidget(self.throttle_bar)
 
         self.update_Throttle(self.ThrottlePercent)
-        self.update_Breaks(self.BreakPercent)
+        self.update_Brakes(self.BrakePercent)
 
-        self.bars_layout.addLayout(self.break_layout)
+        self.bars_layout.addLayout(self.brake_layout)
         self.bars_layout.addWidget(QLabel())
         self.bars_layout.addLayout(self.throttle_layout)
 
@@ -134,16 +135,17 @@ class ElectricCarDashboard(QWidget):
         self.setGeometry(100, 100, 600, 600)
         self.show()
 
-    def update_speed(self, value):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+    def update_Speed(self, value):
+        #ADD CODE LATER TO PROCESS DATA
         self.speed_label.setText(f'Speed: {value} Mph')
 
     def update_Voltage(self, value):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+        #ADD CODE LATER TO PROCESS DATA
         self.voltage_label.setText(f'Battery Level: {value}V')
 
-    def update_AMS_indicator(self):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+    def update_AMS_indicator(self, value):
+        #ADD CODE LATER TO PROCESS DATA
+        self.AMS_Fault = value
         color = 'green' if self.AMS_Fault else 'red'
         style = f'background-color: {color}; border: 1px solid black;'
 
@@ -151,8 +153,9 @@ class ElectricCarDashboard(QWidget):
         self.AMS_indicator.setFixedHeight(self.indicator_box_size)
         self.AMS_indicator.setStyleSheet(style)
 
-    def update_IMD_indicator(self):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+    def update_IMD_indicator(self, value):
+        #ADD CODE LATER TO PROCESS DATA
+        self.IMD_Fault = value
         color = 'green' if self.IMD_Fault else 'red'
         style = f'background-color: {color}; border: 1px solid black;'
 
@@ -160,8 +163,9 @@ class ElectricCarDashboard(QWidget):
         self.IMD_indicator.setFixedHeight(self.indicator_box_size)
         self.IMD_indicator.setStyleSheet(style)
 
-    def update_ECU_indicator(self):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+    def update_ECU_indicator(self, value):
+        #ADD CODE LATER TO PROCESS DATA
+        self.ECU_Fault = value
         color = 'green' if self.ECU_Fault else 'red'
         style = f'background-color: {color}; border: 1px solid black;'
 
@@ -169,17 +173,82 @@ class ElectricCarDashboard(QWidget):
         self.ECU_indicator.setFixedHeight(self.indicator_box_size)
         self.ECU_indicator.setStyleSheet(style)
 
-    def update_Breaks(self, value):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
-        self.break_bar.setValue(value)
+    def update_Brakes(self, value):
+        #ADD CODE LATER TO PROCESS DATA
+        self.brake_bar.setValue(value)
 
     def update_Throttle(self, value):
-        #ADD CODE LATER TO INTERFACE WITH GPIO PINS
+        #ADD CODE LATER TO PROCESS DATA
         self.throttle_bar.setValue(value)
 
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+
     electric_car_dashboard = ElectricCarDashboard()
+
+    functions = [
+
+        ["speed", "update_Speed"],
+
+        ["voltage", "update_Voltage"],
+
+        ["AMS", "update_AMS_indicator"],
+
+        ["IMD", "update_IMD_indicator"],
+
+        ["ECU", "update_ECU_indicator"],
+
+        ["ECU", "update_ECU_indicator"],
+
+        ["brakes", "update_Brakes"],
+
+        ["throttle", "update_Throttle"]
+
+    ]
+
+    # UART code here
+    pass
+    '''
+    ser = serial.Serial(
+        # Serial Port to read the data from
+        port='/dev/ttyAMA0',
+ 
+        #Rate at which the information is shared to the communication channel
+        baudrate = 9600,
+   
+        #Applying Parity Checking (none in this case)
+        parity=serial.PARITY_NONE,
+ 
+       # Pattern of Bits to be read
+        stopbits=serial.STOPBITS_ONE,
+     
+        # Total number of bits to be read
+        bytesize=serial.EIGHTBITS,
+ 
+        # Number of serial commands to accept before timing out
+        timeout=1
+    )
+        # Pause the program for 1 second to avoid overworking the serial port
+    while 1:
+        x=ser.readline()
+        print (x)
+    '''
+
+    read_data = ("function,12")
+    function_information = read_data.split(",")
+
+    for function in functions:
+        if function[0] == function_information[0]:
+            funk = getattr(electric_car_dashboard, function[0])
+            funk(int(function_information[1]))
+            #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
+
     sys.exit(app.exec_())
+
+
+
+
+
+    
