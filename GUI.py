@@ -2,9 +2,24 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QProgressBar
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import Qt
-#import serial
+import serial
 #from gpiozero import Button
 
+import signal
+import RPi.GPIO as GPIO
+
+UARTRX_GPIO = 10 
+
+'''
+def signal_handler(sig, frame):
+    GPIO.cleanup()
+    #sys.exit(0)
+
+def uart_input(channel):
+    print("Signal Read")
+    # read signal
+    # return data?
+'''
 
 class ElectricCarDashboard(QWidget):
 
@@ -211,6 +226,38 @@ if __name__ == '__main__':
     # UART code here
     pass
     '''
+    # Borrowed from https://roboticsbackend.com/raspberry-pi-gpio-interrupts-tutorial/#Python_code_with_RPiGPIO
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(UARTRX_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(UARTRX_GPIO, GPIO.FALLING, 
+            callback=uart_input, bouncetime=100)
+
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.pause()
+
+    '''
+
+     
+    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1) #Probably wrong name, maybe wrong baudrate
+    ser.reset_input_buffer()
+    while True:
+        if ser.in_waiting > 0:
+            line = ser.readline().decode('utf-8').rstrip()
+            read_data = line
+            print(line)
+
+            function_information = read_data.split(",")
+
+            for function in functions:
+                if function[0] == function_information[0]:
+                    funk = getattr(electric_car_dashboard, function[1])
+                    funk(int(function_information[1]))
+                    #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
+    
+
+
+    '''
     ser = serial.Serial(
         # Serial Port to read the data from
         port='/dev/ttyAMA0',
@@ -233,20 +280,21 @@ if __name__ == '__main__':
         # Pause the program for 1 second to avoid overworking the serial port
     while 1:
         x=ser.readline()
-        print (x)
+        read_data = x
     '''
 
-    read_data = ("function,12")
+    """
+    read_data = ("throttle,12") #example
     function_information = read_data.split(",")
 
     for function in functions:
         if function[0] == function_information[0]:
-            funk = getattr(electric_car_dashboard, function[0])
+            funk = getattr(electric_car_dashboard, function[1])
             funk(int(function_information[1]))
             #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
 
     sys.exit(app.exec_())
-
+    """
 
 
 
