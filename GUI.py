@@ -147,7 +147,7 @@ class ElectricCarDashboard(QWidget):
         self.setWindowTitle('Dashboard')
         self.setFont(self.font_details)
         self.setStyleSheet("background-color: gray;")
-        self.setGeometry(100, 100, 600, 600)
+        self.setGeometry(100, 100, 800, 400)
         self.show()
 
     def update_Speed(self, value):
@@ -238,8 +238,8 @@ if __name__ == '__main__':
 
     '''
 
-     
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1) #Probably wrong name, maybe wrong baudrate
+    
+    ser = serial.Serial('/dev/tty1', 115200, timeout=1) #Probably wrong name, maybe wrong baudrate
     ser.reset_input_buffer()
     while True:
         if ser.in_waiting > 0:
@@ -254,6 +254,7 @@ if __name__ == '__main__':
                     funk = getattr(electric_car_dashboard, function[1])
                     funk(int(function_information[1]))
                     #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
+    
     
 
 
@@ -283,7 +284,7 @@ if __name__ == '__main__':
         read_data = x
     '''
 
-    """
+    '''
     read_data = ("throttle,12") #example
     function_information = read_data.split(",")
 
@@ -292,11 +293,8 @@ if __name__ == '__main__':
             funk = getattr(electric_car_dashboard, function[1])
             funk(int(function_information[1]))
             #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
-
+    
     sys.exit(app.exec_())
-    """
-
-
-
-
+    '''
+    
     
