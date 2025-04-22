@@ -1,29 +1,36 @@
+# https://pypi.org/project/RPi.GPIO/ - RPI.GPIO Download, this needs to be downloaded on the pi
+
 import sys
+# sys.path.append("/appdata/local/packages/pythonsoftwarefoundation.python.3.12_qbz5n2kfra8p0\localcache\local-packages\python312\site-packages")
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QProgressBar
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import Qt
 import serial
-#from gpiozero import Button
+# from gpiozero import Button
 
 import signal
-import RPi.GPIO as GPIO
+# try:
+#     import RPi.GPIO as GPIO
+# except (ImportError, RuntimeError, ModuleNotFoundError):
+import fake_rpi as GPIO
+# sys.modules['RPi'] = fake_rpi
+# sys.modules['RPi.GPIO'] = fake_rpi.GPIO
+# import RPi.GPIO as GPIO
 
 UARTRX_GPIO = 10 
 
-'''
-def signal_handler(sig, frame):
-    GPIO.cleanup()
-    #sys.exit(0)
 
-def uart_input(channel):
-    print("Signal Read")
-    # read signal
-    # return data?
-'''
+# def signal_handler(sig, frame):
+#     GPIO.cleanup()
+#     #sys.exit(0)
+
+# def uart_input(channel):
+#     print("Signal Read")
+#     # read signal
+#     # return data?
+
 
 class ElectricCarDashboard(QWidget):
-
-
     def __init__(self):
         super().__init__()
 
@@ -44,10 +51,6 @@ class ElectricCarDashboard(QWidget):
 
 
         self.init_ui()
-
-
-
-
 
     def init_ui(self):
 
@@ -202,7 +205,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     electric_car_dashboard = ElectricCarDashboard()
-
+    # electric_car_dashboard.speed_label.show()
+    app.exec_()
     functions = [
 
         ["speed", "update_Speed"],
@@ -239,7 +243,7 @@ if __name__ == '__main__':
     '''
 
      
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1) #Probably wrong name, maybe wrong baudrate
+    ser = serial.Serial('/dev/ttyS0', 115200, timeout=1) #Probably wrong name, maybe wrong baudrate
     ser.reset_input_buffer()
     while True:
         if ser.in_waiting > 0:
@@ -254,9 +258,6 @@ if __name__ == '__main__':
                     funk = getattr(electric_car_dashboard, function[1])
                     funk(int(function_information[1]))
                     #locals()[function[1]](int(function_information[1])) # maybe should be globals() ?
-    
-
-
     '''
     ser = serial.Serial(
         # Serial Port to read the data from
