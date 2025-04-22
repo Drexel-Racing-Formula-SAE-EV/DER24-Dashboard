@@ -12,10 +12,10 @@ import signal
 # try:
 #     import RPi.GPIO as GPIO
 # except (ImportError, RuntimeError, ModuleNotFoundError):
-import fake_rpi as GPIO
+# import fake_rpi as GPIO
 # sys.modules['RPi'] = fake_rpi
 # sys.modules['RPi.GPIO'] = fake_rpi.GPIO
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 UARTRX_GPIO = 10 
 
