@@ -246,10 +246,11 @@ if __name__ == '__main__':
     ser = serial.Serial('/dev/ttyS0', 115200, timeout=1) #Probably wrong name, maybe wrong baudrate
     ser.reset_input_buffer()
     while True:
-        if ser.in_waiting > 0:
+        # if ser.in_waiting > 0:
+        if True:
             line = ser.readline().decode('utf-8').rstrip()
             read_data = line
-            print(line)
+            print(read_data)
 
             function_information = read_data.split(",")
 
