@@ -6,7 +6,7 @@ while True:
         # ser = serial.Serial('/dev/ttyS0', 115200, timeout=1) 
         # # Ensure the port is correct and not already in use
         print(f"Connected to: {port.portstr}")
-        line = port.readline().decode('utf-8').rstrip()
+        line = port.readline().decode('utf-8')
         print(line)
 
         # port.write(("\r\nSay something:").encode('utf-8'))
