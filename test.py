@@ -1,6 +1,6 @@
 import serial 
 
-port = serial.Serial("/dev/ttyS0", baudrate=115200, timeout=3.0)
+port = serial.Serial("/dev/tty", baudrate=115200, timeout=3.0)
 while True:
     try:
         # ser = serial.Serial('/dev/ttyS0', 115200, timeout=1) 
